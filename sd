@@ -1,0 +1,20 @@
+  
+  
+ public function http_ajaxlist()
+    {
+        $size = 5;
+        $page = $this->http_input->getPost('page');//使用该方法可获取get .post提交过来的数据
+        $pages = (isset($page) && $page) ? trim($page): 1;
+        $offset=($page-1) *  $size;
+        $template = $this->loader->view('app::Msg/msgList');//该方法加载模版
+//可以使用框架封装好的sql方法，或写原生sql通过pdoQuery()发送
+        $res = get_instance()->getMysql()->select('*')->from('fb_msg')->where('del',1)->pdoQuery();
+        $num= get_instance()->getMysql()->select('count(*) as num')->from('fb_msg')->where('del',1)->limit('$size,$offset')->pdoQuery();
+        $data = [
+            'array' => $res,
+            'count'=>$num['result'][0]['num']
+
+        ];
+        $this->http_output->end($template->render($data));//该方法输出模版和数据
+    }
+//注意数据输出格式，在模版页面接受的是数组$data对应的键的值
